@@ -9,15 +9,17 @@ environment: vscode + win10
 
 Use the following code to compile generally:
 
-g++ test.cpp -o t
+g++ src/main.cpp -o output/t
 
 Running:
 
-./t
+./output/t
 
 or
 
-./t 400 100 20 10 (./t screen_with screen_height samples_per_pixel ray_tracing_depth)
+(tips: ./output/t screen_with screen_height samples_per_pixel ray_tracing_depth)
+
+./output/t 400 100 20 10 
 
 -----------------------------------------------------------------------
 
