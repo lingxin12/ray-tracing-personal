@@ -24,6 +24,7 @@
 #include <random>
 #include <atomic>
 #include <thread>
+#include <sstream>
 
 // define
 

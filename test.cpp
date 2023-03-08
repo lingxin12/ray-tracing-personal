@@ -11,8 +11,8 @@
 using namespace lxrt;
 
 // screen size
-const int screen_width = 400;
-const int screen_height = 200;
+int screen_width = 400;
+int screen_height = 200;
 
 // camera parameter
 const double fov = 20;
@@ -27,10 +27,12 @@ const double focus_distance = (look_at - look_from).length();
 const int channel = 4;
 
 // rendering parameter
-const int samples_per_pixel = 20;
-const int rendering_depth = 10;
+int samples_per_pixel = 20;
+int rendering_depth = 10;
 
 std::atomic_int thread_completed(0);
+
+void Menu(int argc, char *argv[]);
 
 color3 RayColor(const Ray &ray, const Hittable &objects, int depth) {
     if(depth <= 0) {
@@ -78,9 +80,11 @@ void CreateScene(SceneObjects& scene) {
     scene.Add(make_shared<Sphere>(vec3(0, 1, -4), 1.0, make_shared<Lambertian>(vec3(0.4, 0.2, 0.1))));
     scene.Add(make_shared<Sphere>(vec3(0, 1, 0), 1.0, make_shared<Metal>(vec3(0.7, 0.6, 0.5), 0.0)));
 }
+
 // void ThreadFunction(const SceneObjects &scene, const Camera& camera, ShowImage& show_image, int i)
 void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& show_image, int i)
 {
+    std::cerr << "thread " << i << " start" << std::endl;
     for(int j = 0; j < screen_width; j ++) {
         ++ thread_completed;
         color3 color(0, 0, 0);
@@ -94,8 +98,11 @@ void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& 
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    // menu
+    Menu(argc, argv);
+
     // scene objects
     SceneObjects scene;
     CreateScene(scene);
@@ -113,8 +120,6 @@ int main()
     show_image.is_open_gamma(true);
 
     // rendering
-    int front_process = 0;
-    std::cerr << "[>-------------------------------------------------]\r[>";
     clock_t start_time = clock();
 
     ///////////////////////thread start
@@ -125,17 +130,21 @@ int main()
     for(auto& it: th) {
         it->detach();
     }
+
+    int front_process = 0;
+    std::cerr << "[>-------------------------------------------------]\r[>";
     while(thread_completed < screen_height * screen_width) {
-        int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
-        if(now_process != front_process) {
-            Sleep(1);
-            std::cerr << "\b";
-            for(int k = 0; k < now_process - front_process; k ++) {
-                std::cerr <<  "=";
-            }
-            std::cerr << ">";
-            front_process = now_process;
-        }
+        std::cerr << std::endl << thread_completed;
+        // int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
+        // if(now_process != front_process) {
+        //     Sleep(1);
+        //     std::cerr << "\b";
+        //     for(int k = 0; k < now_process - front_process; k ++) {
+        //         std::cerr <<  "=";
+        //     }
+        //     std::cerr << ">";
+        //     front_process = now_process;
+        // }
     }
     //////////////////////thread end
 
@@ -172,4 +181,71 @@ int main()
     show_image.Show("output.png");
 
     return 0;
+}
+
+void Menu(int argc, char *argv[])
+{
+    std::function<int(const std::string&)> toInt = [](const std::string &s) -> int {
+        std::stringstream ss(s);
+        int p;
+        ss >> p;
+        return p;
+    };
+
+    std::function<bool(const std::string&)> isInt = [](const std::string &s) -> bool {
+        std::stringstream ss(s);
+        double d; char c;
+        if(!(ss>>d)) return false;
+        if(ss>>c) return false;
+        return true;
+    };
+
+    if(argc == 5 && isInt(std::string(argv[1])) && isInt(std::string(argv[2])) && isInt(std::string(argv[3])) && isInt(std::string(argv[4]))) {
+        int t_screen_width = toInt(std::string(argv[1]));
+        int t_screen_height = toInt(std::string(argv[2]));
+        int t_samples_per_pixel = toInt(std::string(argv[3]));
+        int t_rendering_depth = toInt(std::string(argv[4]));
+        if(100 <= screen_width && screen_width <= 10000 &&
+           100 <= screen_height && screen_height <= 10000 &&
+           10 <= samples_per_pixel && samples_per_pixel <= 200 &&
+           5 <= rendering_depth && rendering_depth <= 100) return;
+    }
+
+    std::cout << "running parameters is invalid" << std::endl;
+
+    std::string is_default = "yes";
+    while(true) {
+        std::cout << "Whether to use custom parameters [Y] yes or [N] no: ";
+        std::cin >> is_default;
+        if(is_default == "yes" || is_default == "y" || is_default == "Y" || is_default == "Yes" || is_default == "YES") {
+            // menu
+            while(true) {
+                std::cout << "Please input screen width (100 to 10000): ";
+                std::cin >> screen_width;
+                if(100 <= screen_width && screen_width <= 10000) break;
+            }
+            while(true) {
+                std::cout << "Please input screen height (100 to 10000): ";
+                std::cin >> screen_height;
+                if(100 <= screen_height && screen_height <= 10000) break;
+            }
+            while(true) {
+                std::cout << "Please input samples per pixel (10 to 200): ";
+                std::cin >> samples_per_pixel;
+                if(10 <= samples_per_pixel && samples_per_pixel <= 200) break;
+            }
+            while(true) {
+                std::cout << "Please input ray tracing depth (5 to 100): ";
+                std::cin >> rendering_depth;
+                if(5 <= rendering_depth && rendering_depth <= 100) break;
+            }
+            ///////////////
+            std::cout << std::endl;
+            break;
+        } else if (is_default == "no" || is_default == "n" || is_default == "N" || is_default == "No" || is_default == "NO") {
+            break;
+        } else {
+            std::cout << "Your input is error!" << std::endl;
+        }
+    }
 }
