@@ -82,19 +82,20 @@ void CreateScene(SceneObjects& scene) {
 }
 
 // void ThreadFunction(const SceneObjects &scene, const Camera& camera, ShowImage& show_image, int i)
-void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& show_image, int i)
+void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& show_image, int starti, int endi)
 {
-    std::cerr << "thread " << i << " start" << std::endl;
-    for(int j = 0; j < screen_width; j ++) {
-        ++ thread_completed;
-        color3 color(0, 0, 0);
-        for(int s = 0; s < samples_per_pixel; s ++) {
-            auto u = (i + random_double()) / screen_height;
-            auto v = (j + random_double()) / screen_width;
-            color += RayColor(camera.get_ray(u, v), scene, rendering_depth);
+    for(int i = starti; i < endi; i ++) {
+        for(int j = 0; j < screen_width; j ++) {
+            ++ thread_completed;
+            color3 color(0, 0, 0);
+            for(int s = 0; s < samples_per_pixel; s ++) {
+                auto u = (i + random_double()) / screen_height;
+                auto v = (j + random_double()) / screen_width;
+                color += RayColor(camera.get_ray(u, v), scene, rendering_depth);
+            }
+            color /= samples_per_pixel;
+            show_image.SetColorAlpha(i, j, color[0], color[1], color[2], 1.0);
         }
-        color /= samples_per_pixel;
-        show_image.SetColorAlpha(i, j, color[0], color[1], color[2], 1.0);
     }
 }
 
@@ -123,9 +124,14 @@ int main(int argc, char *argv[])
     clock_t start_time = clock();
 
     ///////////////////////thread start
-    std::vector<std::unique_ptr<std::thread>> th(screen_height);
-    for(int i = 0; i < screen_height; i ++) {
-        th[i] = std::make_unique<std::thread>(ThreadFunction, scene, camera, std::ref(show_image), i);
+    int cpu_nums = GetSystemCpuNumbers();
+    int thread_nums = cpu_nums * 2;
+    int step = screen_height / thread_nums;
+    std::vector<std::unique_ptr<std::thread>> th(thread_nums);
+    for(int i = 0; i < thread_nums; i ++) {
+        int starti = step * i;
+        int endi = i == thread_nums - 1 ? screen_height : step * (i + 1);
+        th[i] = std::make_unique<std::thread>(ThreadFunction, scene, camera, std::ref(show_image), starti, endi);
     }
     for(auto& it: th) {
         it->detach();
@@ -134,24 +140,26 @@ int main(int argc, char *argv[])
     int front_process = 0;
     std::cerr << "[>-------------------------------------------------]\r[>";
     while(thread_completed < screen_height * screen_width) {
-        std::cerr << std::endl << thread_completed;
-        // int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
-        // if(now_process != front_process) {
-        //     Sleep(1);
-        //     std::cerr << "\b";
-        //     for(int k = 0; k < now_process - front_process; k ++) {
-        //         std::cerr <<  "=";
-        //     }
-        //     std::cerr << ">";
-        //     front_process = now_process;
-        // }
+        int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
+        if(now_process != front_process) {
+            LSleep(1);
+            std::cerr << "\b";
+            for(int k = 0; k < now_process - front_process; k ++) {
+                std::cerr <<  "=";
+            }
+            std::cerr << ">";
+            front_process = now_process;
+        }
     }
     //////////////////////thread end
 
+    //////////////////////no thread start
+    // int front_process = 0;
+    // std::cerr << "[>-------------------------------------------------]\r[>";
     // for(int i = 0; i < screen_height; i ++) {
     //     int now_process = (float)i / screen_height * 50.0;
     //     if(now_process != front_process) {
-    //         Sleep(1);
+    //         LSleep(1);
     //         std::cerr << "\b";
     //         for(int k = 0; k < now_process - front_process; k ++) {
     //             std::cerr <<  "=";
@@ -171,7 +179,7 @@ int main(int argc, char *argv[])
     //         show_image.SetColorAlpha(i, j, color[0], color[1], color[2], 1.0);
     //     }
     // }
-
+    //////////////////////no thread end
 
     clock_t end_time = clock();
     clock_t duration_time = end_time - start_time;

@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <iomanip>
-#include <windows.h>
 #include <cmath>
 #include <string>
 #include <cstdio>
@@ -25,6 +24,13 @@
 #include <atomic>
 #include <thread>
 #include <sstream>
+
+#ifndef __linux__
+#include "Windows.h"
+#else
+#include "unsistd.h"
+#include "sys/sysinfo.h"
+#endif
 
 // define
 
@@ -70,6 +76,24 @@ inline double schlick(double cosine, double ref_idx) {
 
 inline double degrees_to_radians(double degree) {
     return degree / 180.0 * kPI;
+}
+
+inline void LSleep(uint32_t milliseconds) {
+    #ifndef __linux__
+    Sleep(milliseconds);
+    #else
+    sleep(milliseconds / 1000.0);
+    #endif
+}
+
+inline int GetSystemCpuNumbers() {
+    #ifndef __linux__
+    SYSTEM_INFO system_info;
+    GetSystemInfo(&system_info);
+    return system_info.dwNumberOfProcessors;
+    #else
+    return sysconf(_SC_NPROCS_CONF);
+    #endif
 }
 
 // common headers
