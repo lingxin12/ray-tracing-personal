@@ -4,9 +4,11 @@
 #include "common.h"
 #include "show_image.hpp"
 #include "sphere.hpp"
+#include "moving_sphere.hpp"
 #include "scene_objects.hpp"
 #include "camera.hpp"
 #include "material.h"
+#include "bvh_node.hpp"
 
 using namespace lxrt;
 
@@ -57,15 +59,14 @@ color3 RayColor(const Ray &ray, const Hittable &objects, int depth) {
 void CreateScene(SceneObjects& scene) {
     scene.Add(make_shared<Sphere>(vec3(0, -1000, 0), 1000, make_shared<Lambertian>(vec3(0.5, 0.5, 0.5))));
 
-    int sphere_number = 100;
+    int sphere_number = 400;
     for(int i = 0; i < sphere_number; i ++) {
         auto generate_code = random_double();
         vec3 sphere_color(random_double(), random_double(), random_double());
         vec3 sphere_position(random_double(-5, 5), 0.2, random_double(-15, 3));
         if(generate_code < 0.7) {
             // diffuse
-            scene.Add(make_shared<MovingSphere>(sphere_position, sphere_position + vec3(0, random_double(0, 0.5), 0),
-                                                0, 1, 0.2, make_shared<Lambertian>(sphere_color)));
+            scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Lambertian>(sphere_color)));
         } else if(generate_code < 0.9) {
             // metal
             double fuzziness = random_double();
@@ -79,6 +80,9 @@ void CreateScene(SceneObjects& scene) {
     scene.Add(make_shared<Sphere>(vec3(0, 1, -2), 1.0, make_shared<Dielectric>(1.5)));
     scene.Add(make_shared<Sphere>(vec3(0, 1, -4), 1.0, make_shared<Lambertian>(vec3(0.4, 0.2, 0.1))));
     scene.Add(make_shared<Sphere>(vec3(0, 1, 0), 1.0, make_shared<Metal>(vec3(0.7, 0.6, 0.5), 0.0)));
+    
+    // Add BVH
+    scene = SceneObjects(make_shared<BVHNode>(scene, 0, 0));
 }
 
 // void ThreadFunction(const SceneObjects &scene, const Camera& camera, ShowImage& show_image, int i)
@@ -102,11 +106,12 @@ void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& 
 int main(int argc, char *argv[])
 {
     // menu
-    Menu(argc, argv);
+    // Menu(argc, argv);
 
     // scene objects
     SceneObjects scene;
     CreateScene(scene);
+    std::cout << "create scene successful" << std::endl;
     // scene.Add(make_shared<Sphere>(vec3(0,0,-1), 0.5, make_shared<Lambertian>(vec3(0.7, 0.3, 0.3))));
     // scene.Add(make_shared<Sphere>(vec3(0,-100.5,-1), 100, make_shared<Lambertian>(vec3(0.8, 0.8, 0.0))));
 
@@ -142,7 +147,6 @@ int main(int argc, char *argv[])
     while(thread_completed < screen_height * screen_width) {
         int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
         if(now_process != front_process) {
-            LSleep(1);
             std::cerr << "\b";
             for(int k = 0; k < now_process - front_process; k ++) {
                 std::cerr <<  "=";

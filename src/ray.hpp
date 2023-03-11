@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "vec3.hpp"
 
 namespace lxrt {
 

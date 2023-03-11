@@ -21,6 +21,8 @@ struct HitRecord {
 class Hittable {
 public:
     virtual bool Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_record) const = 0;
+
+    virtual bool BoundingBox(double time0, double time1, AABB& output_box) const = 0;
 };
 
 } // namespace lxrt

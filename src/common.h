@@ -24,6 +24,7 @@
 #include <atomic>
 #include <thread>
 #include <sstream>
+#include <exception>
 
 #ifndef __linux__
 #include "Windows.h"
@@ -41,6 +42,13 @@ using std::make_shared;
 // constants
 const double kInfinity = std::numeric_limits<double>::infinity();
 const double kPI = 3.1415926535897932385;
+
+// enum
+enum class Axis: uint8_t {
+    X = 0,
+    Y = 1,
+    Z = 2
+};
 
 // utility functions
 inline double ffmin(double a, double b) {
@@ -60,6 +68,10 @@ inline double random_double() {
 
 inline double random_double(double min, double max) {
     return random_double() * (max - min) + min;
+}
+
+inline int random_int(int min, int max) {
+    return static_cast<int>(random_double() * (max - min + 1) + min);
 }
 
 inline double clamp(double x, double min, double max) {
@@ -99,3 +111,4 @@ inline int GetSystemCpuNumbers() {
 // common headers
 #include "vec3.hpp"
 #include "ray.hpp"
+#include "aabb.hpp"

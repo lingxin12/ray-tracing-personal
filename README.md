@@ -30,7 +30,14 @@ or
 3. Adjust files structure.
 
 # v1.2
+
 1. Optimize multithreaded.
     - The numbers of threads is twice the numbers of cpu cores.
     - Running time is from 1min34s to 24s, which running parameters is 400 100 20 10.
 2. Add some cross platform code.
+
+
+# v1.3
+
+1. Add BVH(Bounding Volume Hierarchies).
+2. The speed of code has increased by 300% - 2000% (It depends on the number of objects).
