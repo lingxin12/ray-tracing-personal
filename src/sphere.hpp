@@ -9,14 +9,22 @@ public:
     Sphere(): center_(point3(0)), radius_(0) { }
     Sphere(const point3 &c, double r, shared_ptr<Material> m): center_(c), radius_(r), material_(m) { }
 
-    virtual bool Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_record) const;
+    virtual bool Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_record) const override;
 
-    virtual bool BoundingBox(double time0, double time1, AABB& output_box) const;
+    virtual bool BoundingBox(double time0, double time1, AABB& output_box) const override;
 
 private:
     point3 center_;
     double radius_;
     shared_ptr<Material> material_;
+
+    static void GetSphereUV(const point3& p, double& u, double& v) {
+        auto theta = std::acos(-p.y());
+        auto phi = std::atan2(-p.z(), p.x()) + kPI;
+
+        u = phi / (2 * kPI);
+        v = theta / kPI;
+    }
 };
 
 bool Sphere::Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_record) const {
@@ -31,6 +39,7 @@ bool Sphere::Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_reco
         hit_record.p = ray.at(temp);
         auto outward_normal = (hit_record.p - center_) / radius_;
         hit_record.set_face_normal(ray, outward_normal);
+        GetSphereUV(outward_normal, hit_record.u, hit_record.v);
         hit_record.material = material_;
         return true;
     }
@@ -40,6 +49,7 @@ bool Sphere::Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_reco
         hit_record.p = ray.at(temp);
         auto outward_normal = (hit_record.p - center_) / radius_;
         hit_record.set_face_normal(ray, outward_normal);
+        GetSphereUV(outward_normal, hit_record.u, hit_record.v);
         hit_record.material = material_;
         return true;
     }

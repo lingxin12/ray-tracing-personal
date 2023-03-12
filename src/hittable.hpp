@@ -6,11 +6,12 @@ namespace lxrt {
 class Material;
 
 struct HitRecord {
-    double t;
-    point3 p;
-    vec3 normal;
-    bool front_face;
-    shared_ptr<Material> material;
+    double t;                          // ray vector parameter
+    point3 p;                          // hit point position
+    vec3 normal;                       // normal
+    bool front_face;                   // is front face
+    shared_ptr<Material> material;     // face material
+    double u, v;                       // texture coordinate
 
     inline void set_face_normal(const Ray &ray, const vec3 &outward_normal) {
         front_face = dot(ray.direction(), outward_normal) < 0;

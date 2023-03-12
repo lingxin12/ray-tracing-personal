@@ -9,6 +9,7 @@
 #include "camera.hpp"
 #include "material.h"
 #include "bvh_node.hpp"
+#include "texture.hpp"
 
 using namespace lxrt;
 
@@ -19,18 +20,18 @@ int screen_height = 200;
 // camera parameter
 const double fov = 20;
 const double aspect = double(screen_width / screen_height);
-const vec3 look_from(-2.8, 1.7, 0.3);
-const vec3 look_at(0, 0, -2);
+const vec3 look_from(13, 2, 3);
+const vec3 look_at(0, 0, 0);
 const vec3 look_up(0, 1, 0);
 const double aperture = 0;
-const double focus_distance = (look_at - look_from).length();
+const double focus_distance = 1;
 
 // image parameter
 const int channel = 4;
 
 // rendering parameter
-int samples_per_pixel = 20;
-int rendering_depth = 10;
+int samples_per_pixel = 50;
+int rendering_depth = 50;
 
 std::atomic_int thread_completed(0);
 
@@ -57,32 +58,44 @@ color3 RayColor(const Ray &ray, const Hittable &objects, int depth) {
 }
 
 void CreateScene(SceneObjects& scene) {
-    scene.Add(make_shared<Sphere>(vec3(0, -1000, 0), 1000, make_shared<Lambertian>(vec3(0.5, 0.5, 0.5))));
+    //----------------
+    auto pertext = make_shared<NoiseTexture>(1);
+    scene.Add(make_shared<Sphere>(vec3(0, -1000, 0), 1000, make_shared<Lambertian>(pertext)));
+    scene.Add(make_shared<Sphere>(vec3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
 
-    int sphere_number = 400;
-    for(int i = 0; i < sphere_number; i ++) {
-        auto generate_code = random_double();
-        vec3 sphere_color(random_double(), random_double(), random_double());
-        vec3 sphere_position(random_double(-5, 5), 0.2, random_double(-15, 3));
-        if(generate_code < 0.7) {
-            // diffuse
-            scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Lambertian>(sphere_color)));
-        } else if(generate_code < 0.9) {
-            // metal
-            double fuzziness = random_double();
-            scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Metal>(sphere_color, fuzziness)));
-        } else {
-            // glass
-            scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Dielectric>(1.5)));
-        }
-    }
+    //----------------
+    // auto checker_texture = make_shared<CheckerTexture>(color3(0.2, 0.3, 0.1), color3(0.9, 0.9, 0.9));
+    // scene.Add(make_shared<Sphere>(vec3(0, 10, 0), 10, make_shared<Lambertian>(checker_texture)));
+    // scene.Add(make_shared<Sphere>(vec3(0, -10, 0), 10, make_shared<Lambertian>(checker_texture)));
 
-    scene.Add(make_shared<Sphere>(vec3(0, 1, -2), 1.0, make_shared<Dielectric>(1.5)));
-    scene.Add(make_shared<Sphere>(vec3(0, 1, -4), 1.0, make_shared<Lambertian>(vec3(0.4, 0.2, 0.1))));
-    scene.Add(make_shared<Sphere>(vec3(0, 1, 0), 1.0, make_shared<Metal>(vec3(0.7, 0.6, 0.5), 0.0)));
+    //----------------
+    // auto checker_texture = make_shared<CheckerTexture>(color3(0.2, 0.3, 0.1), color3(0.9, 0.9, 0.9));
+    // scene.Add(make_shared<Sphere>(vec3(0, -1000, 0), 1000, make_shared<Lambertian>(checker_texture)));
+
+    // int sphere_number = 400;
+    // for(int i = 0; i < sphere_number; i ++) {
+    //     auto generate_code = random_double();
+    //     vec3 sphere_color(random_double(), random_double(), random_double());
+    //     vec3 sphere_position(random_double(-5, 5), 0.2, random_double(-15, 3));
+    //     if(generate_code < 0.7) {
+    //         // diffuse
+    //         scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Lambertian>(make_shared<SolidColor>(sphere_color))));
+    //     } else if(generate_code < 0.9) {
+    //         // metal
+    //         double fuzziness = random_double();
+    //         scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Metal>(make_shared<SolidColor>(sphere_color), fuzziness)));
+    //     } else {
+    //         // glass
+    //         scene.Add(make_shared<Sphere>(sphere_position, 0.2, make_shared<Dielectric>(1.5)));
+    //     }
+    // }
+
+    // scene.Add(make_shared<Sphere>(vec3(0, 1, -2), 1.0, make_shared<Dielectric>(1.5)));
+    // scene.Add(make_shared<Sphere>(vec3(0, 1, -4), 1.0, make_shared<Lambertian>(make_shared<SolidColor>(0.4, 0.2, 0.1))));
+    // scene.Add(make_shared<Sphere>(vec3(0, 1, 0), 1.0, make_shared<Metal>(make_shared<SolidColor>(0.7, 0.6, 0.5), 0.0)));
     
-    // Add BVH
-    scene = SceneObjects(make_shared<BVHNode>(scene, 0, 0));
+    // // Add BVH
+    // scene = SceneObjects(make_shared<BVHNode>(scene, 0, 0));
 }
 
 // void ThreadFunction(const SceneObjects &scene, const Camera& camera, ShowImage& show_image, int i)
@@ -111,7 +124,6 @@ int main(int argc, char *argv[])
     // scene objects
     SceneObjects scene;
     CreateScene(scene);
-    std::cout << "create scene successful" << std::endl;
     // scene.Add(make_shared<Sphere>(vec3(0,0,-1), 0.5, make_shared<Lambertian>(vec3(0.7, 0.3, 0.3))));
     // scene.Add(make_shared<Sphere>(vec3(0,-100.5,-1), 100, make_shared<Lambertian>(vec3(0.8, 0.8, 0.0))));
 
@@ -120,7 +132,7 @@ int main(int argc, char *argv[])
     // scene.Add(make_shared<Sphere>(vec3(-1,0,-1), -0.45, make_shared<Dielectric>(1.5)));
 
     // base setting
-    Camera camera(look_from, look_at, look_up, fov, aspect, aperture, focus_distance, 0, 0);
+    Camera camera(look_from, look_at, look_up, fov, aspect, aperture, focus_distance, 0, 1);
 
     ShowImage show_image(screen_width, screen_height, channel);
     show_image.is_open_gamma(true);

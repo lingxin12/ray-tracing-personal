@@ -41,3 +41,7 @@ or
 
 1. Add BVH(Bounding Volume Hierarchies).
 2. The speed of code has increased by 300% - 2000% (It depends on the number of objects).
+
+# v1.4
+
+1. Add perlin.

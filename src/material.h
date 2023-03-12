@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "hittable.hpp"
+#include "texture.hpp"
 
 namespace lxrt {
 
@@ -11,32 +12,32 @@ public:
 
 class Lambertian: public Material {
 public:
-    Lambertian(const vec3& c): albedo_(c) { }
+    Lambertian(shared_ptr<Texture> c): albedo_(c) { }
 
-    virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const {
+    virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const override {
         vec3 scatter_direction = hit_record.normal + RandomInUnitSphere();
         scattered = Ray(hit_record.p, scatter_direction, ray_in.time());
-        attenuation = albedo_;
+        attenuation = albedo_->Value(hit_record.u, hit_record.v, hit_record.p);
         return true;
     }
 
 private:
-    vec3 albedo_;
+    shared_ptr<Texture> albedo_;
 };
 
 class Metal: public Material {
 public:
-    Metal(const vec3& c, double f): albedo_(c), fuzziness_(f) { }
+    Metal(shared_ptr<Texture> c, double f): albedo_(c), fuzziness_(f) { }
 
-    virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const {
+    virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const override {
         vec3 scatter_direction = reflect(ray_in.direction().normalized(), hit_record.normal);
         scattered = Ray(hit_record.p, scatter_direction + fuzziness_ * RandomInUnitSphere(), ray_in.time());
-        attenuation = albedo_;
+        attenuation = albedo_->Value(hit_record.u, hit_record.v, hit_record.p);
         return dot(scatter_direction, hit_record.normal) > 0;
     }
 
 private:
-    vec3 albedo_;
+    shared_ptr<Texture> albedo_;
     double fuzziness_;
 };
 
@@ -44,7 +45,7 @@ class Dielectric: public Material {
 public:
     Dielectric(double index_of_refraction): index_of_refraction_(index_of_refraction) { }
 
-    virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const {
+    virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const override {
         attenuation = vec3(1, 1, 1);
         double etai_over_etat = hit_record.front_face ? (1.0 / index_of_refraction_) : index_of_refraction_;
 
