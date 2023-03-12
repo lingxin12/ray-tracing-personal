@@ -10,6 +10,7 @@
 #include "material.h"
 #include "bvh_node.hpp"
 #include "texture.hpp"
+#include "image_texture.hpp"
 
 using namespace lxrt;
 
@@ -59,9 +60,15 @@ color3 RayColor(const Ray &ray, const Hittable &objects, int depth) {
 
 void CreateScene(SceneObjects& scene) {
     //----------------
-    auto pertext = make_shared<NoiseTexture>(1);
-    scene.Add(make_shared<Sphere>(vec3(0, -1000, 0), 1000, make_shared<Lambertian>(pertext)));
-    scene.Add(make_shared<Sphere>(vec3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
+    auto image_texture = make_shared<ImageTexture>(std::string("resource/earthmap.jpg"));
+    auto earth_surface = make_shared<Lambertian>(image_texture);
+    auto globe = make_shared<Sphere>(vec3(0, 0, 0), 2, earth_surface);
+    scene.Add(globe);
+
+    //----------------
+    // auto pertext = make_shared<NoiseTexture>(1);
+    // scene.Add(make_shared<Sphere>(vec3(0, -1000, 0), 1000, make_shared<Lambertian>(pertext)));
+    // scene.Add(make_shared<Sphere>(vec3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
 
     //----------------
     // auto checker_texture = make_shared<CheckerTexture>(color3(0.2, 0.3, 0.1), color3(0.9, 0.9, 0.9));

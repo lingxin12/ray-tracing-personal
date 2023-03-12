@@ -45,3 +45,4 @@ or
 # v1.4
 
 1. Add perlin.
+2. Add image texture.
