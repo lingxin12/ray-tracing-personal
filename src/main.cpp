@@ -1,5 +1,6 @@
 #include <iostream>
 #include <time.h>
+#include <sys/time.h>
 
 #include "common.h"
 #include "show_image.hpp"
@@ -210,7 +211,12 @@ int main(int argc, char *argv[])
     show_image.is_open_gamma(true);
 
     // rendering
+    #ifndef __linux__
     clock_t start_time = clock();
+    #else
+    struct timeval sTime, eTime;
+    gettimeofday(&sTime, NULL);
+    #endif
 
     ///////////////////////thread start
     #ifdef OPEN_THREAD
@@ -270,12 +276,19 @@ int main(int argc, char *argv[])
     }
     //////////////////////no thread end
     #endif
-
+    
+    #ifndef __linux__
     clock_t end_time = clock();
-    clock_t duration_time = end_time - start_time;
+    double duration_time = end_time - start_time;
+    #else
+    gettimeofday(&eTime, NULL);
+    long duration_time = (eTime.tv_sec-sTime.tv_sec)*1000000+(eTime.tv_usec-sTime.tv_usec);
+    duration_time /= 1000;
+    #endif
     std::cerr << std::endl << "Ending" << std::endl << "Total time is ";
     if(duration_time / 1000 >= 60) std::cerr << duration_time / 60000 << "min";
     std::cerr << duration_time / 1000 % 60 << "s" << std::endl;
+
     show_image.Show("output.png");
 
     return 0;

@@ -29,8 +29,8 @@
 #ifndef __linux__
 #include "Windows.h"
 #else
-#include "unsistd.h"
-#include "sys/sysinfo.h"
+#include <unistd.h>
+#include <sys/sysinfo.h>
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -111,7 +111,7 @@ inline int GetSystemCpuNumbers() {
     GetSystemInfo(&system_info);
     return system_info.dwNumberOfProcessors;
     #else
-    return sysconf(_SC_NPROCS_CONF);
+    return sysconf(_SC_NPROCESSORS_CONF);
     #endif
 }
 

@@ -1,25 +1,39 @@
 # ray-tracing-personal
 -----------------------------------------------------------------------
 
+Profile(windows):
+
+(If your system is win10, you will download the branch called "master")
+
 Base on ray tracing in one weekend/next week
 
-g++ version: g++ (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
+- g++ version: g++ (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
-environment: vscode + win10
+- environment: vscode + win10
 
-Use the following code to compile generally:
+- Use the following code to compile generally:
 
-**g++ src/main.cpp -o output/t**
+    - **g++ src/main.cpp -o output/t**
 
-Running:
+- Running:
 
-**./output/t**
+    - **./output/t**
 
-or
+    - or
 
-(tips: ./output/t screen_with screen_height samples_per_pixel ray_tracing_depth)
+    - **./output/t 400 100 20 10**
 
-**./output/t 400 100 20 10**
+    - (tips: ./output/t screen_with screen_height samples_per_pixel ray_tracing_depth)
+
+-----------------------------------------------------------------------
+
+Profile(linux):
+
+(If your system is linux, you will download the branch called "linux-master")
+
+- g++ version: g++ (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+
+- environment: vscode + ubuntu20.04
 
 -----------------------------------------------------------------------
 
@@ -49,4 +63,10 @@ or
 3. Add Rectangle Class.
 4. Add Box Class.
 5. Build classic scene: Cornell Box.
-6. Basically complete v1 version. 
+6. Basically complete v1 version.
+
+# v2.0
+
+1. Add the support of linux.
+2. Add process time for linux(Fix the invalid of process time calculation which in windows.)
+3. Fix the invalid of sleep function for linux.
