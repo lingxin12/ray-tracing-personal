@@ -43,6 +43,7 @@ bool Sphere::Hit(const Ray &ray, double t_min, double t_max, HitRecord &hit_reco
         hit_record.material = material_;
         return true;
     }
+    auto temp1 = temp;
     temp = (-b + sqrt(discriminant)) / (2.0 * a);
     if(t_min < temp && temp < t_max) {
         hit_record.t = temp;

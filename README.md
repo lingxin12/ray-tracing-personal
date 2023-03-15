@@ -46,3 +46,7 @@ or
 
 1. Add perlin.
 2. Add image texture.
+3. Add Rectangle Class.
+4. Add Box Class.
+5. Build classic scene: Cornell Box.
+6. Basically complete v1 version. 

@@ -7,6 +7,10 @@ namespace lxrt {
 
 class Material {
 public:
+    virtual vec3 emitted(double u, double v, const vec3& p) const {
+        return vec3(0, 0, 0);
+    }
+
     virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const = 0;
 };
 
