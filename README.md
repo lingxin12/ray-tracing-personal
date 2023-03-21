@@ -87,3 +87,4 @@ Profile(linux):
 
 1. Add GUI.
 2. Add scene manager.
+3. Add /doc/camera_setting.md which sets camera parameter for all scenes.
