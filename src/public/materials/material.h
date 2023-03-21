@@ -17,6 +17,7 @@ public:
 class Lambertian: public Material {
 public:
     Lambertian(shared_ptr<Texture> c): albedo_(c) { }
+    Lambertian(color3 c): Lambertian(make_shared<SolidColor>(c)) { }
 
     virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const override {
         vec3 scatter_direction = hit_record.normal + RandomInUnitSphere();
@@ -32,6 +33,7 @@ private:
 class Metal: public Material {
 public:
     Metal(shared_ptr<Texture> c, double f): albedo_(c), fuzziness_(f) { }
+    Metal(color3 c, double f): Metal(make_shared<SolidColor>(c), f) { }
 
     virtual bool scatter(const Ray& ray_in, const HitRecord& hit_record, vec3& attenuation, Ray& scattered) const override {
         vec3 scatter_direction = reflect(ray_in.direction().normalized(), hit_record.normal);

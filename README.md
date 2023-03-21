@@ -82,3 +82,8 @@ Profile(linux):
 3. Fix the invalid of sleep function for linux.
 4. Rebuild file structure.(Separate .h and .cc and Sort.)
 5. Add Makefile
+
+# v2.1 (2023.03.21)
+
+1. Add GUI.
+2. Add scene manager.

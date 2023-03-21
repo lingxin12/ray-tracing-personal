@@ -4,6 +4,6 @@
 
 /output/output.png
 
-*.exe
+/output/objs/*.o
 
-output.png
+/doc/c++viewing.md

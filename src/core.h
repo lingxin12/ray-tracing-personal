@@ -25,6 +25,11 @@
 #include <thread>
 #include <sstream>
 #include <exception>
+#include <unordered_map>
+#include <mutex>
+#include <future>
+#include <utility>
+#include <chrono> 
 
 #ifndef __linux__
 #include "Windows.h"

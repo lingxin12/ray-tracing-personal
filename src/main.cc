@@ -1,4 +1,4 @@
-    #include <iostream>
+#include <iostream>
 #include <time.h>
 #include <sys/time.h>
 
@@ -17,6 +17,8 @@
 #include "box.h"
 #include "transform.h"
 #include "aabb.h"
+#include "lxrtgui.h"
+#include "render_engine.h"
 
 using namespace lxrt;
 
@@ -45,8 +47,6 @@ int samples_per_pixel = 20;
 int rendering_depth = 10;
 
 std::atomic_int thread_completed(0);
-
-void Menu(int argc, char *argv[]);
 
 color3 RayColor(const Ray &ray, const vec3& background, const Hittable &objects, int depth) {
     if(depth <= 0) {
@@ -192,172 +192,123 @@ void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& 
 
 int main(int argc, char *argv[])
 {
-    // menu
-    Menu(argc, argv);
+    SceneLoadObject::get()->Load();
 
-    // scene objects
-    SceneObjects scene;
-    CreateScene(scene);
-    // scene.Add(make_shared<Sphere>(vec3(0,0,-1), 0.5, make_shared<Lambertian>(vec3(0.7, 0.3, 0.3))));
-    // scene.Add(make_shared<Sphere>(vec3(0,-100.5,-1), 100, make_shared<Lambertian>(vec3(0.8, 0.8, 0.0))));
+    LXRTGUI::Main(argc, argv, "./output/output.png");
+    int n = 1;
+    // RenderEngine render_engine;
+    // RenderingParameters data;
+    // data.Initialize();
+    // data.look_from = vec3(0, 0, 2);
+    // data.background = vec3(0.35, 0.35, 0.35);
+    // if(n >= 1) {
+    //     render_engine.LoadRenderData(data);
+    //     // render_engine.Render();
+    //     std::thread th(&RenderEngine::Render, &render_engine);
+    //     th.detach();
+    //     -- n;
+    // }
 
-    // scene.Add(make_shared<Sphere>(vec3(1,0,-1), 0.5, make_shared<Metal>(vec3(0.8, 0.6, 0.2), 0.2)));
-    // scene.Add(make_shared<Sphere>(vec3(-1,0,-1), 0.5, make_shared<Dielectric>(1.5)));
-    // scene.Add(make_shared<Sphere>(vec3(-1,0,-1), -0.45, make_shared<Dielectric>(1.5)));
+    // while(render_engine.GetNowProcessing() < 100) {
+    //     std::cout << render_engine.GetNowProcessing() << std::endl;
+    // }
 
-    // base setting
-    Camera camera(look_from, look_at, look_up, fov, aspect, aperture, focus_distance, 0, 1);
+    // // scene objects
+    // SceneObjects scene;
+    // CreateScene(scene);
+    // // scene.Add(make_shared<Sphere>(vec3(0,0,-1), 0.5, make_shared<Lambertian>(vec3(0.7, 0.3, 0.3))));
+    // // scene.Add(make_shared<Sphere>(vec3(0,-100.5,-1), 100, make_shared<Lambertian>(vec3(0.8, 0.8, 0.0))));
 
-    ShowImage show_image(screen_width, screen_height, channel);
-    show_image.is_open_gamma(true);
+    // // scene.Add(make_shared<Sphere>(vec3(1,0,-1), 0.5, make_shared<Metal>(vec3(0.8, 0.6, 0.2), 0.2)));
+    // // scene.Add(make_shared<Sphere>(vec3(-1,0,-1), 0.5, make_shared<Dielectric>(1.5)));
+    // // scene.Add(make_shared<Sphere>(vec3(-1,0,-1), -0.45, make_shared<Dielectric>(1.5)));
 
-    // rendering
-    #ifndef __linux__
-    clock_t start_time = clock();
-    #else
-    struct timeval sTime, eTime;
-    gettimeofday(&sTime, NULL);
-    #endif
+    // // base setting
+    // Camera camera(look_from, look_at, look_up, fov, aspect, aperture, focus_distance, 0, 1);
 
-    ///////////////////////thread start
-    #ifdef OPEN_THREAD
-    int cpu_nums = GetSystemCpuNumbers();
-    int thread_nums = cpu_nums * 2;
-    int step = screen_height / thread_nums;
-    std::vector<std::unique_ptr<std::thread>> th(thread_nums);
-    for(int i = 0; i < thread_nums; i ++) {
-        int starti = step * i;
-        int endi = i == thread_nums - 1 ? screen_height : step * (i + 1);
-        th[i] = std::make_unique<std::thread>(ThreadFunction, scene, camera, std::ref(show_image), starti, endi);
-    }
-    for(auto& it: th) {
-        it->detach();
-    }
+    // ShowImage show_image(screen_width, screen_height, channel);
+    // show_image.is_open_gamma(true);
 
-    int front_process = 0;
-    std::cerr << "[>-------------------------------------------------]\r[>";
-    while(thread_completed < screen_height * screen_width) {
-        int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
-        if(now_process != front_process) {
-            std::cerr << "\b";
-            for(int k = 0; k < now_process - front_process; k ++) {
-                std::cerr <<  "=";
-            }
-            std::cerr << ">";
-            front_process = now_process;
-        }
-    }
-    //////////////////////thread end
-    #else
-    //////////////////////no thread start
-    int front_process = 0;
-    std::cerr << "[>-------------------------------------------------]\r[>";
-    for(int i = 0; i < screen_height; i ++) {
-        int now_process = (float)i / screen_height * 50.0;
-        if(now_process != front_process) {
-            LSleep(1);
-            std::cerr << "\b";
-            for(int k = 0; k < now_process - front_process; k ++) {
-                std::cerr <<  "=";
-            }
-            std::cerr << ">";
-            front_process = now_process;
-        }
+    // // rendering
+    // #ifndef __linux__
+    // clock_t start_time = clock();
+    // #else
+    // struct timeval sTime, eTime;
+    // gettimeofday(&sTime, NULL);
+    // #endif
+
+    // ///////////////////////thread start
+    // #ifdef OPEN_THREAD
+    // int cpu_nums = GetSystemCpuNumbers();
+    // int thread_nums = cpu_nums * 2;
+    // int step = screen_height / thread_nums;
+    // std::vector<std::unique_ptr<std::thread>> th(thread_nums);
+    // for(int i = 0; i < thread_nums; i ++) {
+    //     int starti = step * i;
+    //     int endi = i == thread_nums - 1 ? screen_height : step * (i + 1);
+    //     th[i] = std::make_unique<std::thread>(ThreadFunction, scene, camera, std::ref(show_image), starti, endi);
+    // }
+    // for(auto& it: th) {
+    //     it->detach();
+    // }
+
+    // int front_process = 0;
+    // std::cerr << "[>-------------------------------------------------]\r[>";
+    // while(thread_completed < screen_height * screen_width) {
+    //     int now_process = float(thread_completed) / screen_height / screen_width * 50.0;
+    //     if(now_process != front_process) {
+    //         std::cerr << "\b";
+    //         for(int k = 0; k < now_process - front_process; k ++) {
+    //             std::cerr <<  "=";
+    //         }
+    //         std::cerr << ">";
+    //         front_process = now_process;
+    //     }
+    // }
+    // //////////////////////thread end
+    // #else
+    // //////////////////////no thread start
+    // int front_process = 0;
+    // std::cerr << "[>-------------------------------------------------]\r[>";
+    // for(int i = 0; i < screen_height; i ++) {
+    //     int now_process = (float)i / screen_height * 50.0;
+    //     if(now_process != front_process) {
+    //         LSleep(1);
+    //         std::cerr << "\b";
+    //         for(int k = 0; k < now_process - front_process; k ++) {
+    //             std::cerr <<  "=";
+    //         }
+    //         std::cerr << ">";
+    //         front_process = now_process;
+    //     }
         
-        for(int j = 0; j < screen_width; j ++) {
-            color3 color(0, 0, 0);
-            for(int s = 0; s < samples_per_pixel; s ++) {
-                auto u = (i + random_double()) / screen_height;
-                auto v = (j + random_double()) / screen_width;
-                color += RayColor(camera.get_ray(u, v), background, scene, rendering_depth);
-            }
-            color /= samples_per_pixel;
-            show_image.SetColorAlpha(i, j, color[0], color[1], color[2], 1.0);
-        }
-    }
-    //////////////////////no thread end
-    #endif
+    //     for(int j = 0; j < screen_width; j ++) {
+    //         color3 color(0, 0, 0);
+    //         for(int s = 0; s < samples_per_pixel; s ++) {
+    //             auto u = (i + random_double()) / screen_height;
+    //             auto v = (j + random_double()) / screen_width;
+    //             color += RayColor(camera.get_ray(u, v), background, scene, rendering_depth);
+    //         }
+    //         color /= samples_per_pixel;
+    //         show_image.SetColorAlpha(i, j, color[0], color[1], color[2], 1.0);
+    //     }
+    // }
+    // //////////////////////no thread end
+    // #endif
     
-    #ifndef __linux__
-    clock_t end_time = clock();
-    double duration_time = end_time - start_time;
-    #else
-    gettimeofday(&eTime, NULL);
-    long duration_time = (eTime.tv_sec-sTime.tv_sec)*1000000+(eTime.tv_usec-sTime.tv_usec);
-    duration_time /= 1000;
-    #endif
-    std::cerr << std::endl << "Ending" << std::endl << "Total time is ";
-    if(duration_time / 1000 >= 60) std::cerr << duration_time / 60000 << "min";
-    std::cerr << duration_time / 1000 % 60 << "s" << std::endl;
+    // #ifndef __linux__
+    // clock_t end_time = clock();
+    // double duration_time = end_time - start_time;
+    // #else
+    // gettimeofday(&eTime, NULL);
+    // long duration_time = (eTime.tv_sec-sTime.tv_sec)*1000000+(eTime.tv_usec-sTime.tv_usec);
+    // duration_time /= 1000;
+    // #endif
+    // std::cerr << std::endl << "Ending" << std::endl << "Total time is ";
+    // if(duration_time / 1000 >= 60) std::cerr << duration_time / 60000 << "min";
+    // std::cerr << duration_time / 1000 % 60 << "s" << std::endl;
 
-    show_image.Show("output/output.png");
+    // show_image.Show("output/output.png");
 
-    return 0;
-}
-
-void Menu(int argc, char *argv[])
-{
-    std::function<int(const std::string&)> toInt = [](const std::string &s) -> int {
-        std::stringstream ss(s);
-        int p;
-        ss >> p;
-        return p;
-    };
-
-    std::function<bool(const std::string&)> isInt = [](const std::string &s) -> bool {
-        std::stringstream ss(s);
-        double d; char c;
-        if(!(ss>>d)) return false;
-        if(ss>>c) return false;
-        return true;
-    };
-
-    if(argc == 5 && isInt(std::string(argv[1])) && isInt(std::string(argv[2])) && isInt(std::string(argv[3])) && isInt(std::string(argv[4]))) {
-        int t_screen_width = toInt(std::string(argv[1]));
-        int t_screen_height = toInt(std::string(argv[2]));
-        int t_samples_per_pixel = toInt(std::string(argv[3]));
-        int t_rendering_depth = toInt(std::string(argv[4]));
-        if(100 <= screen_width && screen_width <= 10000 &&
-           100 <= screen_height && screen_height <= 10000 &&
-           10 <= samples_per_pixel && samples_per_pixel <= 200 &&
-           5 <= rendering_depth && rendering_depth <= 100) return;
-    }
-
-    std::cout << "running parameters is invalid" << std::endl;
-
-    std::string is_default = "yes";
-    while(true) {
-        std::cout << "Whether to use custom parameters [Y] yes or [N] no: ";
-        std::cin >> is_default;
-        if(is_default == "yes" || is_default == "y" || is_default == "Y" || is_default == "Yes" || is_default == "YES") {
-            // menu
-            while(true) {
-                std::cout << "Please input screen width (100 to 10000): ";
-                std::cin >> screen_width;
-                if(100 <= screen_width && screen_width <= 10000) break;
-            }
-            while(true) {
-                std::cout << "Please input screen height (100 to 10000): ";
-                std::cin >> screen_height;
-                if(100 <= screen_height && screen_height <= 10000) break;
-            }
-            while(true) {
-                std::cout << "Please input samples per pixel (10 to 200): ";
-                std::cin >> samples_per_pixel;
-                if(10 <= samples_per_pixel && samples_per_pixel <= 200) break;
-            }
-            while(true) {
-                std::cout << "Please input ray tracing depth (5 to 100): ";
-                std::cin >> rendering_depth;
-                if(5 <= rendering_depth && rendering_depth <= 100) break;
-            }
-            ///////////////
-            std::cout << std::endl;
-            break;
-        } else if (is_default == "no" || is_default == "n" || is_default == "N" || is_default == "No" || is_default == "NO") {
-            break;
-        } else {
-            std::cout << "Your input is error!" << std::endl;
-        }
-    }
+    // return 0;
 }

@@ -1,0 +1,171 @@
+#include "lxrtgui.h"
+
+using namespace lxrt;
+
+int main(int argc, char** argv)
+{
+    LXRTGUI::Main(argc, argv);
+
+    // // glfwSetErrorCallback(glfw_error_callback);
+    // glfwSetErrorCallback([](int error, const char* description){ fprintf(stderr, "GLFW Error %d: %s\n", error, description); });
+    // if (!glfwInit())
+    //     return 1;
+    
+    // const char* glsl_version = "#version 130";
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    // GLFWwindow* window = glfwCreateWindow(1200, 800, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+    // if (window == NULL)
+    //     return 1;
+    // glfwMakeContextCurrent(window);
+    // glfwSwapInterval(1); // Enable vsync
+
+    // // Setup Dear ImGui context
+    // IMGUI_CHECKVERSION();
+    // ImGui::CreateContext();
+    // ImGuiIO& io = ImGui::GetIO(); (void)io;
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // // Setup Dear ImGui style
+    // // ImGui::StyleColorsDark();
+    // ImGui::StyleColorsLight();
+
+    // // Setup Platform/Renderer backends
+    // ImGui_ImplGlfw_InitForOpenGL(window, true);
+    // ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // // Our state
+    // bool show_demo_window = false;
+    // bool show_another_window = false;
+    // ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    // // screen size
+    // static int screen_width = 400;
+    // static int screen_height = 400;
+    // ImVec4 background(0, 0, 0, 0);
+
+    // // camera parameter
+    // static double fov = 20;
+    // const double aspect = double(screen_width / screen_height);
+    // static ImVec4 look_from(0, 0, 1, 0);
+    // static ImVec4 look_at(0, 0, 0, 0);
+    // const ImVec4 look_up(0, 1, 0, 0);
+    // static double aperture = 0;
+    // static double focus_distance = 2;
+
+    // // image parameter
+    // const int channel = 4;
+
+    // // rendering parameter
+    // static int samples_per_pixel = 20;
+    // static int rendering_depth = 10;
+	
+
+    // GLuint textureID;
+	// glGenTextures(1, &textureID);
+	// glBindTexture(GL_TEXTURE_2D, textureID);
+    // float border_color[] = {0.35f, 0.35f, 0.35f, 1.0f};
+	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
+	// // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+	// stbi_set_flip_vertically_on_load(true);
+    // int nWidth = 0, nHeight = 0, nChannel = 0;
+	// unsigned char* result = stbi_load("./earthmap.jpg", &nWidth, &nHeight, &nChannel, 0);
+
+	// if (result)
+	// {
+	// 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, result);
+	// }
+	// else
+	// {
+	// 	printf("Failed to load texture");
+	// }
+    // stbi_image_free(result);
+
+    // // Main loop
+    // while (!glfwWindowShouldClose(window))
+    // {
+    //     glfwPollEvents();
+
+    //     // Start the Dear ImGui frame
+    //     ImGui_ImplOpenGL3_NewFrame();
+    //     ImGui_ImplGlfw_NewFrame();
+    //     ImGui::NewFrame();
+        
+    //     // parameters setting
+    //     {
+    //         ImGui::Begin("Parameters setting");
+    //         ImGui::SetWindowSize("Parameters setting", ImVec2(400, 800));
+    //         ImGui::SetWindowPos("Parameters setting", ImVec2(0, 0));
+            
+    //         {
+    //             // image setting
+    //             ImGui::SeparatorText("Image Setting");
+    //             ImGui::SliderInt("Image Width", &screen_width, 100, 3840);
+    //             ImGui::SliderInt("Image Height", &screen_height, 100, 2160);
+    //             ImGui::ColorEdit3("Background", (float*)&background);
+    //         }
+
+    //         {
+    //             // camera setting
+    //             ImGui::SeparatorText("Camera Setting");
+    //             ImGui::SliderInt("FOV", (int*)&fov, 10, 80);
+    //             ImGui::InputFloat3("Camera Position", (float*)&look_from);
+    //             ImGui::InputFloat3("Look At", (float*)&look_at);
+    //             ImGui::InputDouble("Aperture", &aperture);
+    //             ImGui::InputDouble("Focus Distance", &focus_distance);
+    //         }
+
+    //         {
+    //             // rendering setting
+    //             ImGui::SeparatorText("Rendering Setting");
+    //             ImGui::SliderInt("Samples per pixel", &samples_per_pixel, 5, 100);
+    //             ImGui::SliderInt("rendering depth", &rendering_depth, 10, 150);
+    //         }
+
+    //         {
+    //             // scene setting
+    //             ImGui::SeparatorText("Scene Setting");
+    //         }
+            
+
+    //         ImGui::End();
+    //     }
+
+    //     // image show
+    //     {
+    //         ImGui::Begin("Result show");
+    //         ImGui::SetWindowSize("Result show", ImVec2(800, 800));
+    //         ImGui::SetWindowPos("Result show", ImVec2(400, 0));
+
+    //         ImGui::Image((void*)textureID, ImVec2(750, 750), ImVec2(0,0), ImVec2(1,1), ImVec4(1,1,1,1), ImVec4(0,0,0,0));
+
+    //         ImGui::End();
+    //     }
+
+    //     // Rendering
+    //     ImGui::Render();
+    //     int display_w, display_h;
+    //     glfwGetFramebufferSize(window, &display_w, &display_h);
+    //     glViewport(0, 0, display_w, display_h);
+    //     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    //     glClear(GL_COLOR_BUFFER_BIT);
+    //     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    //     glfwSwapBuffers(window);
+    // }
+
+    // // Cleanup
+    // ImGui_ImplOpenGL3_Shutdown();
+    // ImGui_ImplGlfw_Shutdown();
+    // ImGui::DestroyContext();
+
+    // glfwDestroyWindow(window);
+    // glfwTerminate();
+
+    return 0;
+}
