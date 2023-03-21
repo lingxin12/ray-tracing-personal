@@ -2,8 +2,6 @@
 
 /output/main
 
-/output/output.png
-
 /output/objs/*.o
 
 /doc/c++viewing.md
