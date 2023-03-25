@@ -58,11 +58,15 @@ int LXRTGUI::Main(int argc, char* argv[], const std::string& output_path) {
     // scene setting
     std::vector<std::string> scene_name;
     static int scene_id = 0;
+    static int camera_id = 0;
     SceneLoadObject::get()->GetAllSceneName(scene_name);
     static char** char_scenes_name = (char**)malloc(sizeof(char*) * scene_name.size());
+    static char** char_camera_name = (char**)malloc(sizeof(char*) * (scene_name.size() + 1));
     for(int i = 0; i < scene_name.size(); i ++) {
         char_scenes_name[i] = const_cast<char*>(scene_name[i].c_str());
+        char_camera_name[i] = const_cast<char*>(scene_name[i].c_str());
     }
+    char_camera_name[scene_name.size()] = const_cast<char*>(std::string("custom").c_str());
     
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -95,8 +99,22 @@ int LXRTGUI::Main(int argc, char* argv[], const std::string& output_path) {
 
             {
                 // camera setting
-                static int fov = data.fov;
                 ImGui::SeparatorText("Camera Setting");
+                ImGui::Combo("Presets", &camera_id, char_camera_name, scene_name.size() + 1);
+
+                static int fov = data.fov;
+
+                if(camera_id < scene_name.size()) {
+                    RenderingParameters camera_data;
+                    if(SceneLoadObject::get()->GetCamera(scene_name[camera_id], camera_data)) {
+                        fov = camera_data.fov;
+                        look_from = ImVec4(camera_data.look_from.x(), camera_data.look_from.y(), camera_data.look_from.z(), 0);
+                        look_at = ImVec4(camera_data.look_at.x(), camera_data.look_at.y(), camera_data.look_at.z(), 0);
+                        data.aperture = camera_data.aperture;
+                        data.focus_distance = camera_data.focus_distance;
+                    }
+                }
+
                 ImGui::SliderInt("FOV", &fov, 10, 80);
                 ImGui::InputFloat3("Camera Position", (float*)&look_from);
                 ImGui::InputFloat3("Look At", (float*)&look_at);
@@ -204,6 +222,8 @@ int LXRTGUI::Main(int argc, char* argv[], const std::string& output_path) {
     }
 
     // Cleanup
+    free(char_scenes_name);
+    free(char_camera_name);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

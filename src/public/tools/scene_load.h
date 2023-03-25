@@ -25,10 +25,14 @@ public:
 
     std::function<void(SceneObjects&)> GetScene(const std::string& SceneName, std::string& SceneMessage);
 
+    bool GetCamera(const std::string& SceneName, RenderingParameters& parameters);
+
 private:
     // Scene name, scene description and scene generate function
     std::unordered_map<std::string,
         std::pair<std::string, std::function<void(SceneObjects&)>>> scenes_;
+    
+    std::unordered_map<std::string, RenderingParameters> camera_;
 
     void InOneWeekScene(SceneObjects& scene);
     void InOneWeekLastScene(SceneObjects& scene);

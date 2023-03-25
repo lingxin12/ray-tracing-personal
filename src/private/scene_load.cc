@@ -3,53 +3,101 @@
 namespace lxrt {
 
 void SceneLoad::Load() {
+    // -------------------- three_boxes --------------------
     scenes_.insert({
         "three_boxes",
         {"ray tracing in one weekend the first half",
         std::bind(&SceneLoad::InOneWeekScene, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "three_boxes",
+        {0, 0, 0, 20, 0, vec3(-2, 3, 3), vec3(0, 0, -1), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- many_boxes --------------------
     scenes_.insert({
         "many_boxes",
         {"ray tracing in one weekend and the last scene",
         std::bind(&SceneLoad::InOneWeekLastScene, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "many_boxes",
+        {0, 0, 0, 20, 0, vec3(-2, 2.5, 5), vec3(0, 0, 4), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- checher_texture --------------------
     scenes_.insert({
         "checher_texture",
         {"checher texture test",
         std::bind(&SceneLoad::ChecherTextureTest, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "checher_texture",
+        {0, 0, 0, 20, 0, vec3(0, 0, 10), vec3(0, 0, 0), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- noise_texture --------------------
     scenes_.insert({
         "noise_texture",
         {"noise texture test",
         std::bind(&SceneLoad::NoiseTextureTest, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "noise_texture",
+        {0, 0, 0, 20, 0, vec3(5, 5, 10), vec3(0, 0, 0), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- image_texture --------------------
     scenes_.insert({
         "image_texture",
         {"extern image texture test",
         std::bind(&SceneLoad::ExternImageTextureTest, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "image_texture",
+        {0, 0, 0, 20, 0, vec3(10, 0, 200), vec3(0, 0, 0), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- light_tests --------------------
     scenes_.insert({
         "light_test",
         {"light test",
         std::bind(&SceneLoad::LightTest, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "light_test",
+        {0, 0, 0, 20, 0, vec3(10, 5, 10), vec3(0, 0, 0), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- box_generate --------------------
     scenes_.insert({
         "box_generate",
         {"box test",
         std::bind(&SceneLoad::BoxTest, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "box_generate",
+        {0, 0, 0, 20, 0, vec3(10, 5, 10), vec3(0, 0, 0), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
+    // -------------------- cornell_box --------------------
     scenes_.insert({
         "cornell_box",
         {"classic scene: cornell box",
         std::bind(&SceneLoad::CornellBoxTest, this, std::placeholders::_1)}
     });
+    camera_.insert({
+        "cornell_box",
+        {0, 0, 0, 40, 0, vec3(278, 278, 800), vec3(278, 278, 0), vec3(0), 0, 2, 0, 0, 0}
+    });
+    // -----------------------------------------------------
 
     std::cerr << "All scenes load successfully!" << std::endl;
 }
@@ -59,6 +107,14 @@ void SceneLoad::GetAllSceneName(std::vector<std::string>& name) {
     for(auto it = scenes_.begin(); it != scenes_.end(); it ++) {
         name.push_back(it->first);
     }
+}
+
+bool SceneLoad::GetCamera(const std::string& SceneName, RenderingParameters& parameters) {
+    if(!camera_.count(SceneName)) {
+        return false;
+    }
+    parameters = camera_[SceneName];
+    return true;
 }
 
 std::function<void(SceneObjects&)> SceneLoad::GetScene(const std::string& SceneName, std::string& SceneMessage) {

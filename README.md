@@ -41,6 +41,8 @@ Profile(linux):
 
     - clean objs file: **make clean**
 
+    - PS: If your image show incorrectly, you may input wrong camera parameters.
+
 -----------------------------------------------------------------------
 
 # v1.0 (2022.04)
@@ -88,3 +90,4 @@ Profile(linux):
 1. Add GUI.
 2. Add scene manager.
 3. Add /doc/camera_setting.md which sets camera parameter for all scenes.
+4. Add camera presets in scene object class.
