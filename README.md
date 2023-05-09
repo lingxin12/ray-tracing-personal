@@ -91,3 +91,8 @@ Profile(linux):
 2. Add scene manager.
 3. Add /doc/camera_setting.md which sets camera parameter for all scenes.
 4. Add camera presets in scene object class.
+
+# v2.2 (2023.05.09)
+
+1. Add denoise.
+2. Add all results in output/results.

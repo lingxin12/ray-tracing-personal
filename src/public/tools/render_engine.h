@@ -67,9 +67,13 @@ private:
 
     bool is_render_use_;
 
-    color3 RayColor(const Ray &ray, const vec3& background, const Hittable &objects, int depth);
+    color3 RayColor(const Ray& ray, const vec3& background, const Hittable& objects, int depth);
 
-    void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& show_image, int starti, int endi);
+    void ThreadFunction(const SceneObjects& scene, const Camera& camera, ShowImage& show_image, int starti, int endi, ShowImage& depth_image, ShowImage& normal_image);
+
+    double GetDepth(const Ray& ray, const Hittable& objects);
+
+    vec3 GetNormal(const Ray& ray, const Hittable& objects);
 };
 
 } // namespace lxrt

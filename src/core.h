@@ -29,7 +29,9 @@
 #include <mutex>
 #include <future>
 #include <utility>
-#include <chrono> 
+#include <chrono>
+#include <tuple>
+#include <fstream>
 
 #ifndef __linux__
 #include "Windows.h"
@@ -50,7 +52,9 @@ using std::make_shared;
 
 // constants
 const double kInfinity = std::numeric_limits<double>::infinity();
-const double kPI = 3.1415926535897932385;
+const double kPI = 3.14159265358979323846;
+const double kE = 2.7182818284590452354;
+const double kSceneMaxDepth = 1000.0;
 
 // enum
 enum class Axis: uint8_t {

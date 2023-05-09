@@ -1,4 +1,5 @@
 #include "lxrtgui.h"
+#include "denoise.h"
 
 namespace lxrt {
 
@@ -88,8 +89,10 @@ int LXRTGUI::Main(int argc, char* argv[], const std::string& output_path) {
             {
                 // image setting
                 ImGui::SeparatorText("Image Setting");
-                ImGui::SliderInt("Image Width", &data.screen_width, 100, 3840);
-                ImGui::SliderInt("Image Height", &data.screen_height, 100, 2160);
+                ImGui::InputInt("Image Width", &data.screen_width);
+                // ImGui::SliderInt("Image Width", &data.screen_width, 100, 3840);
+                ImGui::InputInt("Image Height", &data.screen_height);
+                // ImGui::SliderInt("Image Height", &data.screen_height, 100, 2160);
                 ImGui::SliderFloat("Output Scale", &output_scale, 0.5, 5);
                 ImGui::ColorEdit3("Background", (float*)&background);
 
@@ -151,6 +154,51 @@ int LXRTGUI::Main(int argc, char* argv[], const std::string& output_path) {
                     ++ rendering_count;
                 }
                 ImGui::Text("%s", console_text.c_str());
+            }
+
+            {
+                // Denoise
+                static int sample_radius = 5;
+
+                static float sigma_distance = 2;
+                static float sigma_color = 2;
+                static float sigma_depth = 2;
+                static float sigma_normal = 2;
+
+                static bool open_distance = false;
+                static bool open_color = false;
+                static bool open_depth = false;
+                static bool open_normal = false;
+
+                static int choose_model = 0;
+                
+                static int denoise_int = 0;
+                static std::string denoise_text_ok("denoise ending + ");
+                static std::string denoise_text("waiting");
+
+                ImGui::SeparatorText("Denoise Setting");
+                ImGui::Combo("model", &choose_model, "guass\0\0");
+                ImGui::SliderInt("radius", &sample_radius, 0, 20);
+                ImGui::Text("distance:");
+                ImGui::Checkbox("o1", &open_distance); ImGui::SameLine(); ImGui::DragFloat("dis_sigma", &sigma_distance, 0.1f, 0.1f, 100.0f);
+                ImGui::Text("color:");
+                ImGui::Checkbox("o2", &open_color); ImGui::SameLine(); ImGui::DragFloat("col_sigma", &sigma_color, 0.1f, 0.1f, 100.0f);
+                ImGui::Text("depth:");
+                ImGui::Checkbox("o3", &open_depth); ImGui::SameLine(); ImGui::DragFloat("dep_sigma", &sigma_depth, 0.1f, 0.1f, 100.0f);
+                ImGui::Text("normal:");
+                ImGui::Checkbox("o4", &open_normal); ImGui::SameLine(); ImGui::DragFloat("nor_sigma", &sigma_normal, 0.1f, 0.1f, 100.0f);
+                if(ImGui::Button("Denoise")) {
+                    Denoise denoise(sample_radius,
+                                    open_distance, open_color, open_depth, open_normal,
+                                    sigma_distance, sigma_color, sigma_depth, sigma_normal);
+                    denoise.Run(std::string("output/output_png.txt"),       // input image
+                                std::string("output/depth_output.png"),     // depth image
+                                std::string("output/normal_output.png"),    // normal image
+                                std::string("output/output.png"));          // output image
+                    is_load_output_image = false;  // show image
+                    denoise_text = denoise_text_ok + std::to_string(denoise_int++);
+                }
+                ImGui::Text(denoise_text.c_str());
             }
             
 

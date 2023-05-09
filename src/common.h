@@ -28,6 +28,11 @@ int channel;
 int samples_per_pixel;
 int rendering_depth;
 
+// denoise
+bool open_denoise;
+int radius;
+double sigma;
+
 void Initialize() {
     screen_width = 400;
     screen_height = 400;
@@ -45,6 +50,10 @@ void Initialize() {
 
     samples_per_pixel = 20;
     rendering_depth = 10;
+
+    open_denoise = false;
+    radius = 2;
+    sigma = 1;
 }
 
 };

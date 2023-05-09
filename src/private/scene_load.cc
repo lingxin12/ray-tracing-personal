@@ -215,7 +215,7 @@ void SceneLoad::CornellBoxTest(SceneObjects& scene) {
     auto red = make_shared<Lambertian>(make_shared<SolidColor>(0.65, 0.05, 0.05));
     auto white = make_shared<Lambertian>(make_shared<SolidColor>(0.73, 0.73, 0.73));
     auto green = make_shared<Lambertian>(make_shared<SolidColor>(0.12, 0.45, 0.15));
-    auto light = make_shared<DiffuseLight>(make_shared<SolidColor>(15, 15, 15));
+    auto light = make_shared<DiffuseLight>(make_shared<SolidColor>(60, 60, 60));  // light strength
 
     scene.Add(make_shared<YZRectangle>(0, 555, 0, 555, 0, green));
     scene.Add(make_shared<YZRectangle>(0, 555, 0, 555, 555, red));

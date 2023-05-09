@@ -31,8 +31,8 @@ private:
     }
 
     static void LoadImage(const std::string& path, GLuint textureID) {
-        // stbi_set_flip_vertically_on_load(true);
         int nWidth = 0, nHeight = 0, nChannel = 0;
+        stbi_set_flip_vertically_on_load(false);
         unsigned char* result = stbi_load(path.c_str(), &nWidth, &nHeight, &nChannel, 0);
 
         if (result)
